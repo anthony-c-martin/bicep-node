@@ -5,8 +5,8 @@ import {
   MessageConnection,
 } from "vscode-jsonrpc/node";
 import { getBicepCliDownloadUrl, installBicepCliWithArch } from "./install";
-import { CompileParamsRequest, CompileParamsResponse, CompileRequest, CompileResponse, GetDeploymentGraphRequest, GetDeploymentGraphResponse, GetFileReferencesRequest, GetFileReferencesResponse, GetMetadataRequest, GetMetadataResponse, VersionRequest, VersionResponse } from "./types";
-import { compileParamsRequestType, compileRequestType, getDeploymentGraphRequestType, getFileReferencesRequestType, getMetadataRequestType, hasMinimumVersion, openConnection, versionRequestType } from "./jsonrpc";
+import * as types from "./types";
+import * as jsonrpc from "./jsonrpc";
 
 /**
  * Helper class to install and interact with the Bicep CLI.
@@ -21,12 +21,12 @@ export class Bicep {
    * @returns          A `Bicep` instance.
    */
   static async initialize(bicepPath: string) {
-    const connection = await openConnection(bicepPath);
+    const connection = await jsonrpc.openConnection(bicepPath);
     const bicep = new Bicep(connection);
 
     try {
       const version = await bicep.version();
-      const { success, minimumVersion } = hasMinimumVersion(version);
+      const { success, minimumVersion } = jsonrpc.hasMinimumVersion(version, "0.25.3");
       if (!success) {
         throw new Error(`Bicep CLI version ${version} is not supported. Please install version ${minimumVersion} or later.`);
       }
@@ -84,7 +84,7 @@ export class Bicep {
    * @returns        The version.
    */
   async version(): Promise<string> {
-    const response = await this.connection.sendRequest(versionRequestType, {});
+    const response = await this.connection.sendRequest(jsonrpc.versionRequestType, {});
 
     return response.version;
   }
@@ -95,8 +95,8 @@ export class Bicep {
    * @param request  The compilation request.
    * @returns        The compilation response.
    */
-  async compile(request: CompileRequest): Promise<CompileResponse> {
-    return await this.connection.sendRequest(compileRequestType, request);
+  async compile(request: types.CompileRequest): Promise<types.CompileResponse> {
+    return await this.connection.sendRequest(jsonrpc.compileRequestType, request);
   }
 
   /**
@@ -105,8 +105,8 @@ export class Bicep {
    * @param request  The compilation request.
    * @returns        The compilation response.
    */
-  async compileParams(request: CompileParamsRequest): Promise<CompileParamsResponse> {
-    return await this.connection.sendRequest(compileParamsRequestType, request);
+  async compileParams(request: types.CompileParamsRequest): Promise<types.CompileParamsResponse> {
+    return await this.connection.sendRequest(jsonrpc.compileParamsRequestType, request);
   }
 
   /**
@@ -115,8 +115,8 @@ export class Bicep {
    * @param request  The getMetadata request.
    * @returns        The getMetadata response.
    */
-  async getMetadata(request: GetMetadataRequest): Promise<GetMetadataResponse> {
-    return await this.connection.sendRequest(getMetadataRequestType, request);
+  async getMetadata(request: types.GetMetadataRequest): Promise<types.GetMetadataResponse> {
+    return await this.connection.sendRequest(jsonrpc.getMetadataRequestType, request);
   }
 
   /**
@@ -125,8 +125,8 @@ export class Bicep {
    * @param request  The getDeploymentGraph request.
    * @returns        The getDeploymentGraph response.
    */
-  async getDeploymentGraph(request: GetDeploymentGraphRequest): Promise<GetDeploymentGraphResponse> {
-    return await this.connection.sendRequest(getDeploymentGraphRequestType, request);
+  async getDeploymentGraph(request: types.GetDeploymentGraphRequest): Promise<types.GetDeploymentGraphResponse> {
+    return await this.connection.sendRequest(jsonrpc.getDeploymentGraphRequestType, request);
   }
 
   /**
@@ -135,8 +135,34 @@ export class Bicep {
    * @param request  The getFileReferences request.
    * @returns        The getFileReferences response.
    */
-  async getFileReferences(request: GetFileReferencesRequest): Promise<GetFileReferencesResponse> {
-    return await this.connection.sendRequest(getFileReferencesRequestType, request);
+  async getFileReferences(request: types.GetFileReferencesRequest): Promise<types.GetFileReferencesResponse> {
+    return await this.connection.sendRequest(jsonrpc.getFileReferencesRequestType, request);
+  }
+
+  /**
+   * Gets a snapshot of a Bicep parameters file.
+   *
+   * @param request  The getSnapshot request.
+   * @returns        The getSnapshot response.
+   */
+  async getSnapshot(request: types.GetSnapshotRequest): Promise<types.GetSnapshotResponse> {
+    if (!jsonrpc.hasMinimumVersion(await this.version(), "0.36.1").success) {
+      throw new Error("Bicep CLI version 0.36.1 or later is required.");
+    }
+    return await this.connection.sendRequest(jsonrpc.getSnapshotRequestType, request);
+  }
+
+  /**
+   * Formats a Bicep file.
+   *
+   * @param request  The format request.
+   * @returns        The format response.
+   */
+  async format(request: types.FormatRequest): Promise<types.FormatResponse> {
+    if (!jsonrpc.hasMinimumVersion(await this.version(), "0.37.0").success) {
+      throw new Error("Bicep CLI version 0.37.0 or later is required.");
+    }
+    return await this.connection.sendRequest(jsonrpc.formatRequestType, request);
   }
 
   /**

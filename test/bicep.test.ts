@@ -141,6 +141,38 @@ describe("Bicep class", () => {
     ]);
   });
 
+  it("should generate a snapshot for a bicep file", async () => {
+    const bicepPath = path.join(__dirname, "samples/bicepparam/main.bicepparam");
+    const result = await bicep.getSnapshot({
+      path: bicepPath,
+      metadata: {
+        tenantId: "00000000-0000-0000-0000-000000000000",
+        subscriptionId: "00000000-0000-0000-0000-000000000000",
+        resourceGroup: "test-rg",
+        location: "eastus",
+        deploymentName: "test-deployment",
+      },
+    });
+
+    const snapshotFilePath = path.join(__dirname, "samples/bicepparam/main.snapshot.json");
+    const actualSnapshot = await readFile(snapshotFilePath, 'utf-8');
+
+    expect(normalizeNewlines(result.snapshot)).toEqual(normalizeNewlines(actualSnapshot));
+  });
+
+  // TODO uncomment after 0.37.X is released
+  // it("should format a bicep file", async () => {
+  //   const bicepPath = path.join(__dirname, "samples/good.bicep");
+  //   const result = await bicep.format({
+  //     path: bicepPath,
+  //   });
+
+  //   const formattedFilePath = path.join(__dirname, "samples/good.formatted.bicep");
+  //   const actualFormatted = await readFile(formattedFilePath, 'utf-8');
+
+  //   expect(normalizeNewlines(result.contents)).toEqual(normalizeNewlines(actualFormatted));
+  // });
+
   it("should throw for an invalid bicep exe path", async () => {
     try {
       await Bicep.initialize('asdasdfasdfsdff');

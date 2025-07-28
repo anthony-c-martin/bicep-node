@@ -109,3 +109,35 @@ export interface GetFileReferencesRequest {
 export interface GetFileReferencesResponse {
   filePaths: string[];
 }
+
+export interface GetSnapshotRequest {
+  path: string;
+  metadata: GetSnapshotRequestMetadataDefinition;
+  externalInputs?: GetSnapshotRequestExternalInputValue[];
+}
+
+export interface GetSnapshotRequestMetadataDefinition {
+  tenantId?: string;
+  subscriptionId?: string;
+  resourceGroup?: string;
+  location?: string;
+  deploymentName?: string;
+}
+
+export interface GetSnapshotRequestExternalInputValue {
+  kind: string;
+  config?: any;
+  value: any;
+}
+
+export interface GetSnapshotResponse {
+  snapshot: string;
+}
+
+export interface FormatRequest {
+  path: string;
+}
+
+export interface FormatResponse {
+  contents: string;
+}
