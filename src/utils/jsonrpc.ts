@@ -51,10 +51,20 @@ export const getFileReferencesRequestType = new RequestType<
   never
 >("bicep/getFileReferences");
 
+export const getSnapshotRequestType = new RequestType<
+  types.GetSnapshotRequest,
+  types.GetSnapshotResponse,
+  never
+>("bicep/getSnapshot");
 
-export function hasMinimumVersion(version: string) {
-  const minimumVersion = '0.25.3';
-  const compareResult = version.localeCompare(minimumVersion, undefined, { numeric: true, sensitivity: 'base' });
+export const formatRequestType = new RequestType<
+  types.FormatRequest,
+  types.FormatResponse,
+  never
+>("bicep/format");
+
+export function hasMinimumVersion(actualVersion: string, minimumVersion: string) {
+  const compareResult = actualVersion.localeCompare(minimumVersion, undefined, { numeric: true, sensitivity: 'base' });
 
   return {
     success: compareResult >= 0,
@@ -74,7 +84,7 @@ function tryGetVersionNumberError(bicepPath: string) {
   }
 
   const actualVersion = versionMatch[1];
-  const { success, minimumVersion } = hasMinimumVersion(actualVersion);
+  const { success, minimumVersion } = hasMinimumVersion(actualVersion, "0.25.3");
   if (!success) {
     return `A minimum Bicep version of ${minimumVersion} is required. Detected version ${actualVersion} from '${bicepPath} --version'`;
   }
