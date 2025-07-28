@@ -1,6 +1,6 @@
 {
   "name": "bicep-node",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Node wrapper for interacting with the Bicep CLI.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -25,7 +25,7 @@
   "homepage": "https://github.com/anthony-c-martin/bicep-node#readme",
   "devDependencies": {
     "@types/jest": "29.5.14",
-    "@types/node-fetch": "^2.6.9",
+    "@types/node-fetch": "^2.6.12",
     "@typescript-eslint/eslint-plugin": "7.0.0",
     "@typescript-eslint/parser": "6.21.0",
     "eslint": "8.57.1",
