@@ -1,6 +1,5 @@
 import path from 'path';
 import fs from 'fs/promises';
-import fetch from 'node-fetch';
 
 const downloadBaseUrl = 'https://downloads.bicep.azure.com';
 const latestReleaseUrl = `${downloadBaseUrl}/releases/latest`;
