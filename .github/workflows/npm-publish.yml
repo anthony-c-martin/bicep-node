@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   npm-publish:
     name: NPM Publish
@@ -16,11 +20,10 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 24
+          package-manager-cache: false
 
       - run: npm ci
 
       - run: npm run build
 
       - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
