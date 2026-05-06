@@ -33,6 +33,8 @@ jobs:
     - name: npm ci
       run: npm ci
 
+    - run: npm run build
+
     - name: Run tests (Release)
       if: env.USE_NIGHTLY != 'true'
       run: npm test

@@ -45,7 +45,7 @@ export async function installBicepCliWithArch(basePath: string, platform: string
   const buffer = await response.arrayBuffer();
 
   const toolPath = path.join(basePath, targetFile);
-  await fs.writeFile(toolPath, Buffer.from(buffer));
+  await fs.writeFile(toolPath, new Uint8Array(buffer));
   await fs.chmod(toolPath, 0o755);
 
   return toolPath;
